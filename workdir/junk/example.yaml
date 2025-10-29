@@ -1,0 +1,7 @@
+trainer:
+  total_epochs: 15
+  batch_size: 64
+
+model:
+  name: Qwen2.5-3B
+  lr: 3e-6

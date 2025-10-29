@@ -52,7 +52,7 @@ def run_ppo(config, task_runner_class=None) -> None:
                 model paths, and training hyperparameters.
         task_runner_class: For recipe to change TaskRunner.
     """
-    # Check if Ray is not initialized
+    # Ray start가 안 되어 있다면,
     if not ray.is_initialized():
         # Initialize Ray with a local cluster configuration
         # Set environment variables in the runtime environment to control tokenizer parallelism,
@@ -71,7 +71,7 @@ def run_ppo(config, task_runner_class=None) -> None:
         runtime_env = OmegaConf.merge(default_runtime_env, runtime_env_kwargs)
         ray_init_kwargs = OmegaConf.create({**ray_init_kwargs, "runtime_env": runtime_env})
         print(f"ray init kwargs: {ray_init_kwargs}")
-        ray.init(**OmegaConf.to_container(ray_init_kwargs))
+        ray.init(**OmegaConf.to_container(ray_init_kwargs)) # omegaconfig를 dict로 변환
 
     if task_runner_class is None:
         task_runner_class = ray.remote(num_cpus=1)(TaskRunner)  # please make sure main_task is not scheduled on head
@@ -293,7 +293,7 @@ class TaskRunner:
             config, tokenizer, num_examine=0, **config.reward_model.get("reward_kwargs", {})
         )
         val_reward_fn = load_reward_manager(
-            config, tokenizer, num_examine=1, **config.reward_model.get("reward_kwargs", {})
+            config, tokenizer, num_examine=5, **config.reward_model.get("reward_kwargs", {})
         )
 
         resource_pool_manager = self.init_resource_pool_mgr(config)
